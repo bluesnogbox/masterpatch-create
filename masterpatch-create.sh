@@ -29,8 +29,7 @@ cur_path="~/android/masterpatch.${day}"
 mkdir -p ./system/bin ./system/cameradata ./system/etc ./system/lib/hw ./system/lib/modules system/usr/keylayout
 
 adb start-server
-adb root
-adb remount
+adb shell "su -c 'mount -o remount,rw /system'"
 
 cd ${cur_path}/system/bin
 for x in ${system_bin[@]}; do
@@ -73,4 +72,6 @@ cp ../dependencies/* ./META-INF/com/google/android/
 zip -rv ./masterpatch.${day}.zip ./META-INF ./system
 rm -rf ./META-INF ./system
 
+adb shell "su -c 'mount -o remount,ro /system'"
+adb kill-server
 echo -e "Master patch is done. It is located at ${cur_path}/masterpatch.${day}.zip"
