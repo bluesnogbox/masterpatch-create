@@ -50,29 +50,13 @@ for x in ${system_lib_modules[@]}; do
   adb pull /system/lib/modules/${x} ./
 done
 
-cd ${cur_path}/system/usr/keylayout
+cd ${cur_path}/system/lib/usr/keylayout
 for x in ${system_usr_keylayout[@]}; do
   adb pull /system/usr/keylayout/${x} ./
 done
 
 cd $cur_path
-mkdir -p META-INF/com/google/android
-mv ./update-binary ./META-INF/com/google/android/
-echo "ui_print("I537 MasterPatch for S4 ROMs");
-ui_print("- By thisisapoorusernamechoice");
-ui_print("Script by my-blue-snog-box");
-show_progress(1.000000, 0);
-ui_print("Mounting system");
-mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
-set_progress(0.100000);
-ui_print("Patching");
-package_extract_dir("system", "/system");
-set_progress(0.400000);
-ui_print("Done!");
-ui_print("Unmounting system");
-unmount("/system");
-ui_print("Please restart");
-" > ./META-INF/com/google/android/updater-script
+mv ~/masterpatch-create/META-INF ${cur_path}/
 zip -rv ./masterpatch.${day}.zip ./META-INF ./system
 rm -rf ./META-INF ./system
 
