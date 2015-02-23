@@ -11,25 +11,14 @@ system_lib_hw=( camera.msm8960.so )
 system_lib_modules=( dhd.ko scsi_wait_scan.ko )
 system_lib_usr_keylayout=( gpio-keys.kl )
 
-if [ ! -d ~/android/dependencies ]; then
-  mkdir -p ~/android/dependencies
-  mv ./dependencies/ ~/android/dependencies
-fi
-
-if [ ! -d ~/bin ]; then
-  mkdir -p ~/bin
-  echo "PATH=${PATH}:~/bin" >> ~/.bashrc
-  cp ./masterpatch-create.sh ~/bin/
-  chmod +x ~/bin/masterpatch-create.sh
-fi
-
-mkdir -p ~/android/masterpatch.${day}
-cd ~/android/masterpatch.${day}
-cur_path="~/android/masterpatch.${day}"
-mkdir -p ./system/bin ./system/cameradata ./system/etc ./system/lib/hw ./system/lib/modules system/usr/keylayout
-
 adb start-server
 adb shell "su -c 'mount -o remount,rw /system'"
+echo -e "Unlock your phone and make sure that you give ADB root permissions"
+sleep 5
+mkdir -p ~/android/masterpatch
+cp ~/masterpatch-create/update-binary ~/android/masterpatch/
+cur_path=${HOME}/android/masterpatch
+mkdir -p ~/android/masterpatch/system/lib/usr/keylayout ~/android/masterpatch/system/lib/modules ~/android/masterpatch/system/lib/hw ~/android/masterpatch/system/bin ~/android/masterpatch/system/etc ~/android/masterpatch/system/cameradata
 
 cd ${cur_path}/system/bin
 for x in ${system_bin[@]}; do
@@ -68,7 +57,22 @@ done
 
 cd $cur_path
 mkdir -p META-INF/com/google/android
-cp ../dependencies/* ./META-INF/com/google/android/
+mv ./update-binary ./META-INF/com/google/android/
+echo "ui_print("I537 MasterPatch for S4 ROMs");
+ui_print("- By thisisapoorusernamechoice");
+ui_print("Script by my-blue-snog-box");
+show_progress(1.000000, 0);
+ui_print("Mounting system");
+mount("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/system", "/system");
+set_progress(0.100000);
+ui_print("Patching");
+package_extract_dir("system", "/system");
+set_progress(0.400000);
+ui_print("Done!");
+ui_print("Unmounting system");
+unmount("/system");
+ui_print("Please restart");
+" > ./META-INF/com/google/android/updater-script
 zip -rv ./masterpatch.${day}.zip ./META-INF ./system
 rm -rf ./META-INF ./system
 
